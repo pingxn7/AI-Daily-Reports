@@ -1,0 +1,255 @@
+"""
+Aggregator service - Create daily summaries with ranked tweets.
+Selects top 10 for highlights, generates AI summary of key insights.
+"""
+from typing import List, Dict, Optional
+from datetime import datetime, date, timedelta
+from loguru import logger
+from sqlalchemy.orm import Session
+from sqlalchemy import func
+import anthropic
+
+from app.config import settings
+from app.models.processed_tweet import ProcessedTweet
+from app.models.daily_summary import DailySummary, SummaryTweet, DisplayType
+from app.services.ai_analyzer import ai_analyzer
+from app.services.screenshot_service import screenshot_service
+
+
+class AggregatorService:
+    """Service to create daily summaries of AI news."""
+
+    def __init__(self):
+        self.client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
+
+    def generate_url_slug(self, summary_date: date) -> str:
+        """
+        Generate URL-friendly slug for summary.
+
+        Args:
+            summary_date: Date of the summary
+
+        Returns:
+            URL slug
+        """
+        return summary_date.strftime("%Y-%m-%d-ai-news")
+
+    def extract_topics(self, tweets: List[ProcessedTweet]) -> List[str]:
+        """
+        Extract and count topics from tweets.
+
+        Args:
+            tweets: List of ProcessedTweet objects
+
+        Returns:
+            List of top topics
+        """
+        topic_counts = {}
+
+        for tweet in tweets:
+            if tweet.topics:
+                for topic in tweet.topics:
+                    topic_counts[topic] = topic_counts.get(topic, 0) + 1
+
+        # Sort by count and return top topics
+        sorted_topics = sorted(topic_counts.items(), key=lambda x: x[1], reverse=True)
+        return [topic for topic, count in sorted_topics[:10]]
+
+    async def generate_highlights_summary(self, top_tweets: List[ProcessedTweet]) -> str:
+        """
+        Generate AI summary of top 10 curated tweets.
+
+        Args:
+            top_tweets: List of top 10 ProcessedTweet objects
+
+        Returns:
+            AI-generated highlights summary
+        """
+        if not top_tweets:
+            return "No highlights available."
+
+        # Prepare tweets for summarization
+        tweets_text = "\n\n".join([
+            f"Tweet {i+1} by @{tweet.tweet.account.username}:\n"
+            f"Summary: {tweet.summary}\n"
+            f"Engagement: {tweet.tweet.like_count} likes, {tweet.tweet.retweet_count} retweets\n"
+            f"Importance: {tweet.importance_score}/10"
+            for i, tweet in enumerate(top_tweets)
+        ])
+
+        prompt = f"""Based on the following top 10 AI news tweets from today, create a concise highlights summary in Chinese.
+
+The summary should:
+1. Start with a brief overview paragraph (2-3 sentences) of the key themes and developments
+2. Follow with 3-5 bullet points highlighting the most important insights
+3. Be written in a professional, informative tone
+4. Focus on what's new, important, or trending in AI
+
+Top 10 Tweets:
+{tweets_text}
+
+Provide the summary in Chinese (Simplified):"""
+
+        try:
+            message = self.client.messages.create(
+                model=settings.claude_model,
+                max_tokens=1500,
+                messages=[{"role": "user", "content": prompt}]
+            )
+
+            summary = message.content[0].text.strip()
+            logger.info("Generated highlights summary with Claude API")
+            return summary
+
+        except Exception as e:
+            logger.error(f"Error generating highlights summary: {e}")
+            return "今日AI领域有多项重要进展，详见下方精选推文。"
+
+    async def create_daily_summary(
+        self,
+        db: Session,
+        summary_date: Optional[date] = None
+    ) -> Optional[DailySummary]:
+        """
+        Create daily summary with ranked tweets.
+
+        Args:
+            db: Database session
+            summary_date: Date for summary (defaults to yesterday)
+
+        Returns:
+            Created DailySummary or None if error
+        """
+        if summary_date is None:
+            summary_date = date.today() - timedelta(days=1)
+
+        logger.info(f"Creating daily summary for {summary_date}")
+
+        # Check if summary already exists
+        existing = db.query(DailySummary).filter(
+            func.date(DailySummary.date) == summary_date
+        ).first()
+
+        if existing:
+            logger.warning(f"Summary for {summary_date} already exists")
+            return existing
+
+        # Get all AI-related tweets for the day
+        start_datetime = datetime.combine(summary_date, datetime.min.time())
+        end_datetime = datetime.combine(summary_date, datetime.max.time())
+
+        ai_tweets = db.query(ProcessedTweet).join(ProcessedTweet.tweet).filter(
+            ProcessedTweet.is_ai_related == True,
+            ProcessedTweet.processed_at >= start_datetime,
+            ProcessedTweet.processed_at <= end_datetime
+        ).order_by(ProcessedTweet.importance_score.desc()).all()
+
+        if not ai_tweets:
+            logger.info(f"No AI-related tweets found for {summary_date}")
+            return None
+
+        logger.info(f"Found {len(ai_tweets)} AI-related tweets for {summary_date}")
+
+        # Select top tweets for highlights
+        top_count = min(settings.top_tweets_count, len(ai_tweets))
+        top_tweets = ai_tweets[:top_count]
+        other_tweets = ai_tweets[top_count:]
+
+        # Generate highlights summary using Claude (focus on top 10 only)
+        highlights_summary = await self.generate_highlights_summary(top_tweets)
+
+        # Extract topics from all tweets
+        topics = self.extract_topics(ai_tweets)
+
+        # Create summary record
+        summary = DailySummary(
+            date=start_datetime,
+            url_slug=self.generate_url_slug(summary_date),
+            tweet_count=len(ai_tweets),
+            top_tweets_count=len(top_tweets),
+            other_tweets_count=len(other_tweets),
+            highlights_summary=highlights_summary,
+            topics=topics,
+            summary_text=f"Daily AI news summary for {summary_date}",
+            created_at=datetime.utcnow()
+        )
+
+        db.add(summary)
+        db.flush()  # Get summary.id
+
+        # Link highlight tweets (top 10)
+        for i, tweet in enumerate(top_tweets):
+            link = SummaryTweet(
+                summary_id=summary.id,
+                processed_tweet_id=tweet.id,
+                display_type=DisplayType.HIGHLIGHT,
+                rank_order=i
+            )
+            db.add(link)
+
+        # Link other tweets (compact display)
+        for i, tweet in enumerate(other_tweets):
+            link = SummaryTweet(
+                summary_id=summary.id,
+                processed_tweet_id=tweet.id,
+                display_type=DisplayType.SUMMARY,
+                rank_order=i
+            )
+            db.add(link)
+
+        db.commit()
+        logger.info(
+            f"Created summary {summary.id}: {len(top_tweets)} highlights, "
+            f"{len(other_tweets)} other tweets"
+        )
+
+        # Translate top tweets only
+        top_tweet_ids = [tweet.id for tweet in top_tweets]
+        await ai_analyzer.translate_top_tweets(db, top_tweet_ids)
+
+        # Generate screenshots for highlights only
+        await screenshot_service.generate_screenshots_for_highlights(db, summary.id)
+
+        return summary
+
+    async def get_summary_with_tweets(
+        self,
+        db: Session,
+        summary_id: int
+    ) -> Optional[Dict]:
+        """
+        Get summary with all tweets organized by display type.
+
+        Args:
+            db: Database session
+            summary_id: DailySummary ID
+
+        Returns:
+            Dictionary with summary and organized tweets
+        """
+        summary = db.query(DailySummary).filter(DailySummary.id == summary_id).first()
+
+        if not summary:
+            return None
+
+        # Get highlights (top 10 with full display)
+        highlights = db.query(ProcessedTweet).join(SummaryTweet).filter(
+            SummaryTweet.summary_id == summary_id,
+            SummaryTweet.display_type == DisplayType.HIGHLIGHT
+        ).order_by(SummaryTweet.rank_order).all()
+
+        # Get other news (compact display)
+        other_news = db.query(ProcessedTweet).join(SummaryTweet).filter(
+            SummaryTweet.summary_id == summary_id,
+            SummaryTweet.display_type == DisplayType.SUMMARY
+        ).order_by(SummaryTweet.rank_order).all()
+
+        return {
+            "summary": summary,
+            "highlights": highlights,
+            "other_news": other_news
+        }
+
+
+# Global aggregator instance
+aggregator_service = AggregatorService()
