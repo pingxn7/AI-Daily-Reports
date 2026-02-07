@@ -35,7 +35,7 @@ ACCOUNTS_TO_MONITOR = [
         "display_name": "OpenAI",
     },
     {
-        "user_id": "1603818258",
+        "user_id": "1603818260",
         "username": "AnthropicAI",
         "display_name": "Anthropic",
     },
@@ -65,7 +65,7 @@ ACCOUNTS_TO_MONITOR = [
         "display_name": "François Chollet",
     },
     {
-        "user_id": "2861417424",
+        "user_id": "1692398803",
         "username": "GoogleAI",
         "display_name": "Google AI",
     },
@@ -73,11 +73,6 @@ ACCOUNTS_TO_MONITOR = [
         "user_id": "1526228120",
         "username": "DeepMind",
         "display_name": "Google DeepMind",
-    },
-    {
-        "user_id": "50393960",
-        "username": "OpenAI",
-        "display_name": "OpenAI",
     },
     {
         "user_id": "1159274324",
