@@ -19,7 +19,7 @@ class Tweet(Base):
     text = Column(Text, nullable=False)
     created_at = Column(DateTime, nullable=False, index=True)  # Tweet creation time
     tweet_url = Column(String(500), nullable=False)
-    metadata = Column(JSON, nullable=True)  # Additional tweet metadata
+    tweet_metadata = Column(JSON, nullable=True)  # Additional tweet metadata
 
     # Engagement metrics
     like_count = Column(Integer, default=0, nullable=False)
