@@ -130,16 +130,16 @@ function formatNumber(num: number): string {
   return num.toLocaleString();
 }
 
-export function EventBasedSummary({
+export const EventBasedSummary = React.memo<EventBasedSummaryProps>(({
   summary,
   tweetCount,
   topTweetsCount,
   topics,
-}: EventBasedSummaryProps) {
-  const parsed = parseEventBasedReport(summary);
+}) => {
+  const parsed = React.useMemo(() => parseEventBasedReport(summary), [summary]);
 
   // Tag color mapping
-  const getTagColor = (tag: string) => {
+  const getTagColor = React.useCallback((tag: string) => {
     const colorMap: { [key: string]: string } = {
       '模型': 'from-purple-500 to-pink-500',
       '产品': 'from-blue-500 to-cyan-500',
@@ -149,7 +149,7 @@ export function EventBasedSummary({
       '研究': 'from-indigo-500 to-violet-500',
     };
     return colorMap[tag] || 'from-gray-500 to-slate-500';
-  };
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -447,4 +447,6 @@ export function EventBasedSummary({
       )}
     </div>
   );
-}
+});
+
+EventBasedSummary.displayName = 'EventBasedSummary';

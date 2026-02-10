@@ -7,7 +7,7 @@ interface TweetCardProps {
   variant: 'full' | 'compact';
 }
 
-export function TweetCard({ tweet, variant }: TweetCardProps) {
+export const TweetCard = React.memo<TweetCardProps>(({ tweet, variant }) => {
   if (variant === 'full') {
     return (
       <div className="group bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-200 border border-gray-200 hover:border-blue-300 overflow-hidden">
@@ -291,4 +291,6 @@ export function TweetCard({ tweet, variant }: TweetCardProps) {
       </div>
     </div>
   );
-}
+});
+
+TweetCard.displayName = 'TweetCard';

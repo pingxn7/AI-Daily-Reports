@@ -60,12 +60,12 @@ const processTextWithIcons = (text: string) => {
   return parts.length > 0 ? parts : text;
 };
 
-export function HighlightsSummary({
+export const HighlightsSummary = React.memo<HighlightsSummaryProps>(({
   summary,
   tweetCount,
   topTweetsCount,
   topics,
-}: HighlightsSummaryProps) {
+}) => {
   return (
     <div className="space-y-6 mb-8">
       {/* Statistics Dashboard - Compact */}
@@ -231,4 +231,6 @@ export function HighlightsSummary({
       )}
     </div>
   );
-}
+});
+
+HighlightsSummary.displayName = 'HighlightsSummary';

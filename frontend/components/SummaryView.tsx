@@ -7,7 +7,7 @@ interface SummaryViewProps {
   summary: DailySummaryDetail;
 }
 
-export function SummaryView({ summary }: SummaryViewProps) {
+export const SummaryView = React.memo<SummaryViewProps>(({ summary }) => {
   return (
     <div className="max-w-5xl mx-auto">
       {/* Highlights Summary Section */}
@@ -105,4 +105,6 @@ export function SummaryView({ summary }: SummaryViewProps) {
         )}
     </div>
   );
-}
+});
+
+SummaryView.displayName = 'SummaryView';
