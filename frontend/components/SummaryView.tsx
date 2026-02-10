@@ -23,20 +23,20 @@ export function SummaryView({ summary }: SummaryViewProps) {
       {/* Top 10 Curated Highlights Section */}
       {summary.highlights && summary.highlights.length > 0 && (
         <section className="mb-12">
-          <div className="bg-white rounded-2xl p-6 mb-6 border-2 border-gray-100 shadow-lg">
+          <div className="bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 rounded-2xl p-6 mb-6 border-2 border-orange-200 shadow-xl">
             <div className="flex items-center gap-4">
-              <div className="bg-gradient-to-br from-orange-400 to-red-500 rounded-xl p-4 shadow-md">
+              <div className="bg-gradient-to-br from-orange-500 to-red-600 rounded-xl p-4 shadow-lg">
                 <span className="text-4xl">🔥</span>
               </div>
               <div className="flex-1">
-                <h2 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                  今日精选推文
+                <h2 className="text-3xl font-bold text-gray-900">
+                  今日精选事件
                 </h2>
-                <p className="text-gray-600 mt-1">
+                <p className="text-gray-700 mt-1 font-medium">
                   精心挑选的 {summary.highlights.length} 条最重要的 AI 资讯
                 </p>
               </div>
-              <div className="bg-gradient-to-br from-orange-100 to-red-100 rounded-xl px-6 py-3">
+              <div className="bg-white rounded-xl px-6 py-3 shadow-md border-2 border-orange-300">
                 <div className="text-center">
                   <div className="text-3xl font-bold text-orange-600">
                     {summary.highlights.length}
@@ -50,7 +50,7 @@ export function SummaryView({ summary }: SummaryViewProps) {
             {summary.highlights.map((tweet, index) => (
               <div key={tweet.id} className="relative">
                 {/* Tweet number badge */}
-                <div className="absolute -left-4 top-6 z-10 bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-full w-10 h-10 flex items-center justify-center text-lg font-bold shadow-lg">
+                <div className="absolute -left-4 top-6 z-10 bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold shadow-lg border-4 border-white">
                   {index + 1}
                 </div>
                 <TweetCard tweet={tweet} variant="full" />

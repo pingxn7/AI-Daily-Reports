@@ -9,6 +9,57 @@ interface HighlightsSummaryProps {
   topics: string[] | null;
 }
 
+// 分类标签图标映射
+const categoryIcons: { [key: string]: string } = {
+  '模型': '🤖',
+  '产品': '📦',
+  '市场': '📈',
+  '应用': '⚡',
+  '研究': '🔬',
+  '融资': '💰',
+  '政策': '📋',
+  '人物': '👤',
+  '公司': '🏢',
+  '技术': '⚙️',
+  '开源': '🌟',
+  '数据': '📊',
+};
+
+// 处理文本中的分类标签，添加图标
+const processTextWithIcons = (text: string) => {
+  const regex = /【([^】]+)】/g;
+  const parts = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = regex.exec(text)) !== null) {
+    // 添加标签前的文本
+    if (match.index > lastIndex) {
+      parts.push(text.substring(lastIndex, match.index));
+    }
+
+    const category = match[1];
+    const icon = categoryIcons[category] || '📌';
+
+    // 添加带图标的标签
+    parts.push(
+      <span key={match.index} className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg font-bold text-sm shadow-sm mx-1">
+        <span className="text-base">{icon}</span>
+        <span>{category}</span>
+      </span>
+    );
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  // 添加剩余文本
+  if (lastIndex < text.length) {
+    parts.push(text.substring(lastIndex));
+  }
+
+  return parts.length > 0 ? parts : text;
+};
+
 export function HighlightsSummary({
   summary,
   tweetCount,
@@ -59,14 +110,14 @@ export function HighlightsSummary({
         </div>
       </div>
 
-      {/* AI-generated summary with Markdown rendering */}
-      <div className="bg-white rounded-2xl p-8 border-2 border-gray-100 shadow-lg">
-        <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-blue-200">
-          <div className="bg-gradient-to-br from-blue-400 to-indigo-500 rounded-xl p-3 shadow-md">
+      {/* AI-generated summary with Markdown rendering and category icons */}
+      <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl p-8 border-2 border-blue-200 shadow-xl">
+        <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-blue-300">
+          <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-3 shadow-lg">
             <span className="text-3xl">📌</span>
           </div>
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-            今日关键亮点
+          <h2 className="text-3xl font-bold text-gray-900">
+            今日关键信息
           </h2>
         </div>
 
@@ -77,35 +128,61 @@ export function HighlightsSummary({
               h1: ({ node, ...props }) => (
                 <h1 className="text-3xl font-bold text-gray-900 mt-8 mb-4 flex items-center gap-2" {...props} />
               ),
-              h2: ({ node, ...props }) => (
-                <h2 className="text-2xl font-bold text-gray-800 mt-6 mb-3 flex items-center gap-2" {...props} />
+              h2: ({ node, children, ...props }) => (
+                <h2 className="text-2xl font-bold text-gray-800 mt-6 mb-4 pb-2 border-b-2 border-gray-300 flex items-center gap-2" {...props}>
+                  {children}
+                </h2>
               ),
               h3: ({ node, ...props }) => (
-                <h3 className="text-xl font-bold text-gray-800 mt-5 mb-2" {...props} />
+                <h3 className="text-xl font-bold text-gray-800 mt-5 mb-3" {...props} />
               ),
               h4: ({ node, ...props }) => (
                 <h4 className="text-lg font-semibold text-gray-700 mt-4 mb-2" {...props} />
               ),
-              p: ({ node, ...props }) => (
-                <p className="text-gray-700 leading-relaxed mb-4" {...props} />
-              ),
+              p: ({ node, children, ...props }) => {
+                // 处理段落中的分类标签
+                if (typeof children === 'string') {
+                  return (
+                    <p className="text-gray-700 leading-relaxed mb-3 text-base" {...props}>
+                      {processTextWithIcons(children)}
+                    </p>
+                  );
+                }
+                return (
+                  <p className="text-gray-700 leading-relaxed mb-3 text-base" {...props}>
+                    {children}
+                  </p>
+                );
+              },
               ul: ({ node, ...props }) => (
-                <ul className="space-y-2 mb-4 ml-4" {...props} />
+                <ul className="space-y-3 mb-6 ml-2" {...props} />
               ),
               ol: ({ node, ...props }) => (
-                <ol className="space-y-2 mb-4 ml-4" {...props} />
+                <ol className="space-y-3 mb-6 ml-2" {...props} />
               ),
-              li: ({ node, ...props }) => (
-                <li className="text-gray-700 leading-relaxed" {...props} />
-              ),
+              li: ({ node, children, ...props }) => {
+                // 处理列表项中的分类标签
+                const processedChildren = React.Children.map(children, (child) => {
+                  if (typeof child === 'string') {
+                    return processTextWithIcons(child);
+                  }
+                  return child;
+                });
+
+                return (
+                  <li className="text-gray-700 leading-relaxed pl-2 relative before:content-['•'] before:absolute before:left-[-12px] before:text-blue-500 before:font-bold" {...props}>
+                    {processedChildren}
+                  </li>
+                );
+              },
               hr: ({ node, ...props }) => (
-                <hr className="my-6 border-t-2 border-gray-200" {...props} />
+                <hr className="my-8 border-t-2 border-gray-300" {...props} />
               ),
               blockquote: ({ node, ...props }) => (
-                <blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-4 bg-blue-50 rounded-r-lg" {...props} />
+                <blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-4 bg-white/60 rounded-r-lg" {...props} />
               ),
               a: ({ node, ...props }) => (
-                <a className="text-blue-600 hover:text-blue-700 underline" target="_blank" rel="noopener noreferrer" {...props} />
+                <a className="text-blue-600 hover:text-blue-700 underline font-medium" target="_blank" rel="noopener noreferrer" {...props} />
               ),
               strong: ({ node, ...props }) => (
                 <strong className="font-bold text-gray-900" {...props} />
@@ -115,9 +192,9 @@ export function HighlightsSummary({
               ),
               code: ({ node, inline, ...props }: any) =>
                 inline ? (
-                  <code className="bg-gray-100 text-red-600 px-1.5 py-0.5 rounded text-sm font-mono" {...props} />
+                  <code className="bg-white text-red-600 px-2 py-0.5 rounded text-sm font-mono border border-gray-200" {...props} />
                 ) : (
-                  <code className="block bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm font-mono" {...props} />
+                  <code className="block bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm font-mono my-4" {...props} />
                 ),
             }}
           >
