@@ -10,62 +10,62 @@ interface TweetCardProps {
 export function TweetCard({ tweet, variant }: TweetCardProps) {
   if (variant === 'full') {
     return (
-      <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-gray-200 hover:border-blue-300 overflow-hidden">
+      <div className="group bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 hover:border-blue-300 overflow-hidden">
         {/* Header Section - 账号信息 */}
-        <div className="bg-gradient-to-r from-gray-50 to-blue-50 px-6 py-4 border-b-2 border-gray-200">
-          <div className="flex items-center gap-3">
-            <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg">
+        <div className="bg-gradient-to-r from-gray-50 to-blue-50 px-4 py-3 border-b border-gray-200">
+          <div className="flex items-center gap-2">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-base shadow-md">
               {(tweet.tweet.account.display_name || tweet.tweet.account.username).charAt(0).toUpperCase()}
             </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="font-bold text-gray-900 text-lg">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className="font-bold text-gray-900 text-base truncate">
                   {tweet.tweet.account.display_name || tweet.tweet.account.username}
                 </span>
-                <span className="px-2 py-0.5 bg-blue-500 text-white text-xs font-semibold rounded">
-                  ✓ 认证
+                <span className="px-1.5 py-0.5 bg-blue-500 text-white text-xs font-semibold rounded flex-shrink-0">
+                  ✓
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <span>@{tweet.tweet.account.username}</span>
+              <div className="flex items-center gap-1.5 text-xs text-gray-600">
+                <span className="truncate">@{tweet.tweet.account.username}</span>
                 <span>•</span>
-                <span>{formatDate(tweet.tweet.created_at)}</span>
+                <span className="flex-shrink-0">{formatDate(tweet.tweet.created_at)}</span>
               </div>
             </div>
             {/* Importance badge */}
-            <div className="flex flex-col items-center bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-xl px-4 py-2 shadow-lg">
-              <span className="text-xs font-semibold">重要度</span>
-              <span className="text-2xl font-bold">{tweet.importance_score.toFixed(1)}</span>
+            <div className="flex flex-col items-center bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-lg px-3 py-1.5 shadow-md flex-shrink-0">
+              <span className="text-xs font-semibold leading-tight">重要度</span>
+              <span className="text-lg font-bold leading-tight">{tweet.importance_score.toFixed(1)}</span>
             </div>
           </div>
         </div>
 
         {/* Content Section */}
-        <div className="p-6 space-y-4">
+        <div className="p-4 space-y-3">
           {/* AI Summary - 摘要 */}
           {tweet.summary && (
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border-l-4 border-blue-500">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-xl">💡</span>
-                <h4 className="font-bold text-sm text-blue-900 uppercase tracking-wide">
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-3 border-l-4 border-blue-500">
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <span className="text-base">💡</span>
+                <h4 className="font-bold text-xs text-blue-900 uppercase tracking-wide">
                   核心摘要
                 </h4>
               </div>
-              <p className="text-base text-gray-800 leading-relaxed font-medium">
+              <p className="text-sm text-gray-800 leading-relaxed">
                 {tweet.summary}
               </p>
             </div>
           )}
 
           {/* Original tweet text - 原文 */}
-          <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-xl">📝</span>
-              <h4 className="font-bold text-sm text-gray-700 uppercase tracking-wide">
+          <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <span className="text-base">📝</span>
+              <h4 className="font-bold text-xs text-gray-700 uppercase tracking-wide">
                 原文内容
               </h4>
             </div>
-            <p className="text-gray-700 leading-relaxed text-base">
+            <p className="text-sm text-gray-700 leading-relaxed">
               {tweet.tweet.text}
             </p>
           </div>
@@ -73,14 +73,14 @@ export function TweetCard({ tweet, variant }: TweetCardProps) {
 
           {/* Translation - 翻译 */}
           {tweet.translation && (
-            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border-l-4 border-purple-500">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-xl">🇨🇳</span>
-                <h4 className="font-bold text-sm text-purple-900 uppercase tracking-wide">
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-3 border-l-4 border-purple-500">
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <span className="text-base">🇨🇳</span>
+                <h4 className="font-bold text-xs text-purple-900 uppercase tracking-wide">
                   中文翻译
                 </h4>
               </div>
-              <p className="text-base text-gray-800 leading-relaxed">
+              <p className="text-sm text-gray-800 leading-relaxed">
                 {tweet.translation}
               </p>
             </div>
@@ -88,7 +88,7 @@ export function TweetCard({ tweet, variant }: TweetCardProps) {
 
           {/* Screenshot */}
           {tweet.screenshot_url && (
-            <div className="rounded-xl overflow-hidden border-2 border-gray-200 shadow-md">
+            <div className="rounded-lg overflow-hidden border border-gray-200 shadow-sm">
               <Image
                 src={tweet.screenshot_url}
                 alt="Tweet screenshot"
@@ -102,7 +102,7 @@ export function TweetCard({ tweet, variant }: TweetCardProps) {
 
           {/* Topics - 话题标签 */}
           {tweet.topics && tweet.topics.length > 0 && (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5">
               {tweet.topics.map((topic, index) => {
                 const colors = [
                   'bg-blue-100 text-blue-700 border-blue-300',
@@ -115,7 +115,7 @@ export function TweetCard({ tweet, variant }: TweetCardProps) {
                 return (
                   <span
                     key={index}
-                    className={`px-3 py-1.5 ${colorClass} text-sm font-semibold rounded-lg border`}
+                    className={`px-2 py-1 ${colorClass} text-xs font-semibold rounded border`}
                   >
                     #{topic}
                   </span>
@@ -125,50 +125,50 @@ export function TweetCard({ tweet, variant }: TweetCardProps) {
           )}
 
           {/* Engagement Metrics - 互动数据 */}
-          <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 border border-gray-200">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-xl">📊</span>
-              <h4 className="font-bold text-sm text-gray-700 uppercase tracking-wide">
+          <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-3 border border-gray-200">
+            <div className="flex items-center gap-1.5 mb-2">
+              <span className="text-base">📊</span>
+              <h4 className="font-bold text-xs text-gray-700 uppercase tracking-wide">
                 互动数据
               </h4>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div className="bg-white rounded-lg p-3 border-2 border-red-200 hover:border-red-400 transition-colors">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-2xl">👍</span>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <div className="bg-white rounded-md p-2 border border-red-200 hover:border-red-400 transition-colors">
+                <div className="flex items-center gap-1 mb-0.5">
+                  <span className="text-lg">👍</span>
                   <span className="text-xs text-gray-600 font-semibold">点赞</span>
                 </div>
-                <div className="text-xl font-bold text-red-600">
+                <div className="text-base font-bold text-red-600">
                   {formatNumber(tweet.tweet.like_count)}
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg p-3 border-2 border-green-200 hover:border-green-400 transition-colors">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-2xl">🔄</span>
+              <div className="bg-white rounded-md p-2 border border-green-200 hover:border-green-400 transition-colors">
+                <div className="flex items-center gap-1 mb-0.5">
+                  <span className="text-lg">🔄</span>
                   <span className="text-xs text-gray-600 font-semibold">转发</span>
                 </div>
-                <div className="text-xl font-bold text-green-600">
+                <div className="text-base font-bold text-green-600">
                   {formatNumber(tweet.tweet.retweet_count)}
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg p-3 border-2 border-blue-200 hover:border-blue-400 transition-colors">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-2xl">💬</span>
+              <div className="bg-white rounded-md p-2 border border-blue-200 hover:border-blue-400 transition-colors">
+                <div className="flex items-center gap-1 mb-0.5">
+                  <span className="text-lg">💬</span>
                   <span className="text-xs text-gray-600 font-semibold">回复</span>
                 </div>
-                <div className="text-xl font-bold text-blue-600">
+                <div className="text-base font-bold text-blue-600">
                   {formatNumber(tweet.tweet.reply_count)}
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg p-3 border-2 border-orange-200 hover:border-orange-400 transition-colors">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-2xl">🔖</span>
+              <div className="bg-white rounded-md p-2 border border-orange-200 hover:border-orange-400 transition-colors">
+                <div className="flex items-center gap-1 mb-0.5">
+                  <span className="text-lg">🔖</span>
                   <span className="text-xs text-gray-600 font-semibold">收藏</span>
                 </div>
-                <div className="text-xl font-bold text-orange-600">
+                <div className="text-base font-bold text-orange-600">
                   {formatNumber(tweet.tweet.bookmark_count)}
                 </div>
               </div>
@@ -176,17 +176,17 @@ export function TweetCard({ tweet, variant }: TweetCardProps) {
           </div>
 
           {/* Link to original */}
-          <div className="pt-2">
+          <div className="pt-1">
             <a
               href={tweet.tweet.tweet_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-semibold shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-semibold text-sm shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300"
             >
               <span>🔗</span>
               <span>查看原推文</span>
               <svg
-                className="w-5 h-5"
+                className="w-4 h-4"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
