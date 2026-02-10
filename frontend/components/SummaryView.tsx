@@ -22,23 +22,23 @@ export function SummaryView({ summary }: SummaryViewProps) {
 
       {/* Top 10 Curated Highlights Section */}
       {summary.highlights && summary.highlights.length > 0 && (
-        <section className="mb-12">
-          <div className="bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 rounded-2xl p-6 mb-6 border-2 border-orange-200 shadow-xl">
-            <div className="flex items-center gap-4">
-              <div className="bg-gradient-to-br from-orange-500 to-red-600 rounded-xl p-4 shadow-lg">
-                <span className="text-4xl">🔥</span>
+        <section className="mb-8">
+          <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-5 mb-5 border border-orange-200 shadow-md">
+            <div className="flex items-center gap-3">
+              <div className="bg-gradient-to-br from-orange-500 to-red-600 rounded-xl p-3 shadow-sm">
+                <span className="text-3xl">🔥</span>
               </div>
               <div className="flex-1">
-                <h2 className="text-3xl font-bold text-gray-900">
+                <h2 className="text-2xl font-bold text-gray-900">
                   今日精选事件
                 </h2>
-                <p className="text-gray-700 mt-1 font-medium">
+                <p className="text-gray-700 text-sm font-medium">
                   精心挑选的 {summary.highlights.length} 条最重要的 AI 资讯
                 </p>
               </div>
-              <div className="bg-white rounded-xl px-6 py-3 shadow-md border-2 border-orange-300">
+              <div className="bg-white rounded-lg px-4 py-2 shadow-sm border border-orange-300">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-orange-600">
+                  <div className="text-2xl font-bold text-orange-600">
                     {summary.highlights.length}
                   </div>
                   <div className="text-xs text-orange-700 font-semibold">精选内容</div>
@@ -46,11 +46,11 @@ export function SummaryView({ summary }: SummaryViewProps) {
               </div>
             </div>
           </div>
-          <div className="space-y-6">
+          <div className="space-y-4">
             {summary.highlights.map((tweet, index) => (
               <div key={tweet.id} className="relative">
                 {/* Tweet number badge */}
-                <div className="absolute -left-4 top-6 z-10 bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold shadow-lg border-4 border-white">
+                <div className="absolute -left-3 top-5 z-10 bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-full w-9 h-9 flex items-center justify-center text-base font-bold shadow-md border-2 border-white">
                   {index + 1}
                 </div>
                 <TweetCard tweet={tweet} variant="full" />
@@ -63,22 +63,22 @@ export function SummaryView({ summary }: SummaryViewProps) {
       {/* More AI News Section (Compact Display) */}
       {summary.other_news && summary.other_news.length > 0 && (
         <section>
-          <div className="bg-white rounded-2xl p-6 mb-6 border-2 border-gray-100 shadow-lg">
-            <div className="flex items-center gap-4">
-              <div className="bg-gradient-to-br from-blue-400 to-indigo-500 rounded-xl p-4 shadow-md">
-                <span className="text-4xl">📰</span>
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 mb-5 border border-blue-200 shadow-md">
+            <div className="flex items-center gap-3">
+              <div className="bg-gradient-to-br from-blue-400 to-indigo-500 rounded-xl p-3 shadow-sm">
+                <span className="text-3xl">📰</span>
               </div>
               <div className="flex-1">
-                <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                   更多 AI 资讯
                 </h2>
-                <p className="text-gray-600 mt-1">
+                <p className="text-gray-600 text-sm">
                   其他值得关注的 {summary.other_news.length} 条 AI 相关动态
                 </p>
               </div>
-              <div className="bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl px-6 py-3">
+              <div className="bg-white rounded-lg px-4 py-2 shadow-sm border border-blue-300">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-blue-600">
+                  <div className="text-2xl font-bold text-blue-600">
                     {summary.other_news.length}
                   </div>
                   <div className="text-xs text-blue-700 font-semibold">更多资讯</div>
@@ -86,7 +86,7 @@ export function SummaryView({ summary }: SummaryViewProps) {
               </div>
             </div>
           </div>
-          <div className="grid gap-4">
+          <div className="grid gap-3">
             {summary.other_news.map((tweet) => (
               <TweetCard key={tweet.id} tweet={tweet} variant="compact" />
             ))}
@@ -97,10 +97,10 @@ export function SummaryView({ summary }: SummaryViewProps) {
       {/* Empty state */}
       {(!summary.highlights || summary.highlights.length === 0) &&
         (!summary.other_news || summary.other_news.length === 0) && (
-          <div className="text-center py-20 bg-white rounded-2xl shadow-lg border-2 border-gray-100">
-            <div className="text-6xl mb-4">📭</div>
-            <p className="text-gray-500 text-xl font-medium">暂无 AI 资讯</p>
-            <p className="text-gray-400 text-sm mt-2">今天还没有收集到相关内容</p>
+          <div className="text-center py-16 bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl shadow-sm border border-gray-200">
+            <div className="text-5xl mb-3">📭</div>
+            <p className="text-gray-500 text-lg font-medium">暂无 AI 资讯</p>
+            <p className="text-gray-400 text-sm mt-1">今天还没有收集到相关内容</p>
           </div>
         )}
     </div>
