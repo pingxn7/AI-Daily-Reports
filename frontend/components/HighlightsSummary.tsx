@@ -1,4 +1,6 @@
 import React from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface HighlightsSummaryProps {
   summary: string;
@@ -57,7 +59,7 @@ export function HighlightsSummary({
         </div>
       </div>
 
-      {/* AI-generated summary */}
+      {/* AI-generated summary with Markdown rendering */}
       <div className="bg-white rounded-2xl p-8 border-2 border-gray-100 shadow-lg">
         <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-blue-200">
           <div className="bg-gradient-to-br from-blue-400 to-indigo-500 rounded-xl p-3 shadow-md">
@@ -68,10 +70,59 @@ export function HighlightsSummary({
           </h2>
         </div>
 
-        <div className="prose prose-base max-w-none">
-          <div className="text-gray-700 leading-relaxed whitespace-pre-line text-lg">
+        <div className="prose prose-lg max-w-none markdown-content">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              h1: ({ node, ...props }) => (
+                <h1 className="text-3xl font-bold text-gray-900 mt-8 mb-4 flex items-center gap-2" {...props} />
+              ),
+              h2: ({ node, ...props }) => (
+                <h2 className="text-2xl font-bold text-gray-800 mt-6 mb-3 flex items-center gap-2" {...props} />
+              ),
+              h3: ({ node, ...props }) => (
+                <h3 className="text-xl font-bold text-gray-800 mt-5 mb-2" {...props} />
+              ),
+              h4: ({ node, ...props }) => (
+                <h4 className="text-lg font-semibold text-gray-700 mt-4 mb-2" {...props} />
+              ),
+              p: ({ node, ...props }) => (
+                <p className="text-gray-700 leading-relaxed mb-4" {...props} />
+              ),
+              ul: ({ node, ...props }) => (
+                <ul className="space-y-2 mb-4 ml-4" {...props} />
+              ),
+              ol: ({ node, ...props }) => (
+                <ol className="space-y-2 mb-4 ml-4" {...props} />
+              ),
+              li: ({ node, ...props }) => (
+                <li className="text-gray-700 leading-relaxed" {...props} />
+              ),
+              hr: ({ node, ...props }) => (
+                <hr className="my-6 border-t-2 border-gray-200" {...props} />
+              ),
+              blockquote: ({ node, ...props }) => (
+                <blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-4 bg-blue-50 rounded-r-lg" {...props} />
+              ),
+              a: ({ node, ...props }) => (
+                <a className="text-blue-600 hover:text-blue-700 underline" target="_blank" rel="noopener noreferrer" {...props} />
+              ),
+              strong: ({ node, ...props }) => (
+                <strong className="font-bold text-gray-900" {...props} />
+              ),
+              em: ({ node, ...props }) => (
+                <em className="italic text-gray-800" {...props} />
+              ),
+              code: ({ node, inline, ...props }: any) =>
+                inline ? (
+                  <code className="bg-gray-100 text-red-600 px-1.5 py-0.5 rounded text-sm font-mono" {...props} />
+                ) : (
+                  <code className="block bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm font-mono" {...props} />
+                ),
+            }}
+          >
             {summary}
-          </div>
+          </ReactMarkdown>
         </div>
       </div>
 
