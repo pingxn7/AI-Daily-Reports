@@ -11,7 +11,7 @@ from app.database import get_db_context
 from app.services.twitter_collector import twitter_collector
 from app.services.ai_analyzer import ai_analyzer
 from app.services.aggregator import aggregator_service
-from app.services.email_service import email_service
+from app.services.email_service_v2 import email_service
 
 
 # Global scheduler instance
@@ -43,7 +43,7 @@ async def collect_tweets_task():
 async def daily_summary_task():
     """
     Scheduled task to create daily summary and send email.
-    Runs daily at 8 AM by default.
+    Runs daily at 8 AM Beijing time by default.
     """
     logger.info("Starting scheduled daily summary task")
 
@@ -63,17 +63,17 @@ async def daily_summary_task():
             summary_data = await aggregator_service.get_summary_with_tweets(db, summary.id)
 
             if summary_data:
-                # Send email
+                # Send email with new email service
                 email_sent = await email_service.send_daily_digest(
                     summary=summary_data["summary"],
                     highlights=summary_data["highlights"]
                 )
 
                 if email_sent:
-                    summary.email_sent_at = datetime.utcnow()
+                    summary.email_sent_at = datetime.now()
                     summary.email_recipient = settings.email_to
                     db.commit()
-                    logger.info("Daily digest email sent successfully")
+                    logger.info(f"Daily digest email sent successfully to {settings.email_to}")
 
     except Exception as e:
         logger.error(f"Error in daily summary task: {e}")

@@ -20,7 +20,7 @@ class TwitterCollector:
         self.api_key = settings.twitter_api_key
         self.base_url = settings.twitter_api_base_url
         self.headers = {
-            "Authorization": f"Bearer {self.api_key}",
+            "x-api-key": self.api_key,
             "Content-Type": "application/json"
         }
 
@@ -48,9 +48,61 @@ class TwitterCollector:
 
         return score
 
+    async def fetch_user_by_username(self, username: str) -> Optional[Dict]:
+        """
+        Fetch user information by username.
+
+        Args:
+            username: Twitter username (without @)
+
+        Returns:
+            Dictionary with user_id, username, and display_name, or None if not found
+        """
+        try:
+            # Use the twitter/user/last_tweets endpoint to get user info
+            # This endpoint works with userName parameter (note the capital N)
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.get(
+                    f"{self.base_url}/twitter/user/last_tweets",
+                    headers=self.headers,
+                    params={"userName": username}  # Note: userName with capital N
+                )
+                response.raise_for_status()
+                data = response.json()
+
+                # Check if request was successful
+                if data.get("status") != "success":
+                    logger.error(f"API returned non-success status for user {username}")
+                    return None
+
+                # Check if user is unavailable (suspended, etc.)
+                if data.get("data", {}).get("unavailable"):
+                    reason = data.get("data", {}).get("unavailableReason", "Unknown")
+                    logger.warning(f"User {username} is unavailable: {reason}")
+                    return None
+
+                # Extract user info from the first tweet's author
+                tweets = data.get("data", {}).get("tweets", [])
+                if not tweets:
+                    logger.warning(f"No tweets found for user {username}")
+                    return None
+
+                author = tweets[0].get("author", {})
+                return {
+                    "user_id": author.get("id"),
+                    "username": author.get("userName"),
+                    "display_name": author.get("name"),
+                }
+        except httpx.HTTPError as e:
+            logger.error(f"HTTP error fetching user {username}: {e}")
+            return None
+        except Exception as e:
+            logger.error(f"Error fetching user {username}: {e}")
+            return None
+
     async def fetch_user_tweets(
         self,
-        user_id: str,
+        username: str,
         since_id: Optional[str] = None,
         max_results: int = 100
     ) -> List[Dict]:
@@ -58,7 +110,7 @@ class TwitterCollector:
         Fetch tweets from a specific user.
 
         Args:
-            user_id: Twitter user ID
+            username: Twitter username (without @)
             since_id: Only return tweets after this ID
             max_results: Maximum number of tweets to fetch
 
@@ -66,33 +118,54 @@ class TwitterCollector:
             List of tweet dictionaries
         """
         try:
-            params = {
-                "max_results": max_results,
-                "tweet.fields": "created_at,public_metrics,entities",
-                "exclude": "retweets,replies"  # Only original tweets
-            }
-
-            if since_id:
-                params["since_id"] = since_id
-
+            # Use the correct twitterapi.io endpoint
             async with httpx.AsyncClient(timeout=30.0) as client:
                 response = await client.get(
-                    f"{self.base_url}/users/{user_id}/tweets",
+                    f"{self.base_url}/twitter/user/last_tweets",
                     headers=self.headers,
-                    params=params
+                    params={"userName": username}
                 )
                 response.raise_for_status()
                 data = response.json()
 
-                tweets = data.get("data", [])
-                logger.info(f"Fetched {len(tweets)} tweets from user {user_id}")
-                return tweets
+                # Check if request was successful
+                if data.get("status") != "success":
+                    logger.error(f"API returned non-success status for user @{username}")
+                    return []
+
+                # Check if user is unavailable
+                if data.get("data", {}).get("unavailable"):
+                    reason = data.get("data", {}).get("unavailableReason", "Unknown")
+                    logger.warning(f"User @{username} is unavailable: {reason}")
+                    return []
+
+                # Extract tweets from response
+                tweets = data.get("data", {}).get("tweets", [])
+
+                # Filter out retweets and replies
+                original_tweets = [
+                    t for t in tweets
+                    if t.get("type") == "tweet" and not t.get("isReply", False)
+                ]
+
+                # Filter by since_id if provided
+                if since_id:
+                    original_tweets = [
+                        t for t in original_tweets
+                        if int(t.get("id", 0)) > int(since_id)
+                    ]
+
+                # Limit results
+                original_tweets = original_tweets[:max_results]
+
+                logger.info(f"Fetched {len(original_tweets)} tweets from @{username}")
+                return original_tweets
 
         except httpx.HTTPError as e:
-            logger.error(f"HTTP error fetching tweets for user {user_id}: {e}")
+            logger.error(f"HTTP error fetching tweets for @{username}: {e}")
             return []
         except Exception as e:
-            logger.error(f"Error fetching tweets for user {user_id}: {e}")
+            logger.error(f"Error fetching tweets for @{username}: {e}")
             return []
 
     def parse_tweet(self, tweet_data: dict, account_id: int) -> Dict:
@@ -100,7 +173,7 @@ class TwitterCollector:
         Parse raw tweet data into database format.
 
         Args:
-            tweet_data: Raw tweet data from API
+            tweet_data: Raw tweet data from twitterapi.io API
             account_id: Database ID of the monitored account
 
         Returns:
@@ -108,16 +181,22 @@ class TwitterCollector:
         """
         tweet_id = tweet_data.get("id")
         text = tweet_data.get("text", "")
-        created_at = datetime.fromisoformat(
-            tweet_data.get("created_at", "").replace("Z", "+00:00")
-        )
 
-        # Extract engagement metrics
-        metrics = tweet_data.get("public_metrics", {})
-        like_count = metrics.get("like_count", 0)
-        retweet_count = metrics.get("retweet_count", 0)
-        reply_count = metrics.get("reply_count", 0)
-        bookmark_count = metrics.get("bookmark_count", 0)
+        # Parse created_at from twitterapi.io format
+        # Format: "Tue Feb 10 00:43:37 +0000 2026"
+        created_at_str = tweet_data.get("createdAt", "")
+        try:
+            created_at = datetime.strptime(created_at_str, "%a %b %d %H:%M:%S %z %Y")
+        except (ValueError, TypeError):
+            # Fallback to current time if parsing fails
+            created_at = datetime.utcnow()
+            logger.warning(f"Failed to parse created_at: {created_at_str}, using current time")
+
+        # Extract engagement metrics from twitterapi.io format
+        like_count = tweet_data.get("likeCount", 0)
+        retweet_count = tweet_data.get("retweetCount", 0)
+        reply_count = tweet_data.get("replyCount", 0)
+        bookmark_count = tweet_data.get("bookmarkCount", 0)
 
         # Calculate engagement score
         engagement_score = self.calculate_engagement_score({
@@ -127,8 +206,8 @@ class TwitterCollector:
             "bookmark_count": bookmark_count
         })
 
-        # Build tweet URL
-        tweet_url = f"https://twitter.com/i/status/{tweet_id}"
+        # Use the URL from API response
+        tweet_url = tweet_data.get("url", f"https://twitter.com/i/status/{tweet_id}")
 
         return {
             "tweet_id": tweet_id,
@@ -162,9 +241,9 @@ class TwitterCollector:
         """
         logger.info(f"Collecting tweets for @{account.username}")
 
-        # Fetch tweets from API
+        # Fetch tweets from API using username
         tweets_data = await self.fetch_user_tweets(
-            user_id=account.user_id,
+            username=account.username,
             since_id=account.last_tweet_id
         )
 

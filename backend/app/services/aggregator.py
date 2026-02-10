@@ -134,14 +134,15 @@ Provide the summary in Chinese (Simplified):"""
             logger.warning(f"Summary for {summary_date} already exists")
             return existing
 
-        # Get all AI-related tweets for the day
+        # Get all AI-related tweets for the day (by tweet creation date, not processing date)
         start_datetime = datetime.combine(summary_date, datetime.min.time())
         end_datetime = datetime.combine(summary_date, datetime.max.time())
 
-        ai_tweets = db.query(ProcessedTweet).join(ProcessedTweet.tweet).filter(
+        from app.models.tweet import Tweet
+        ai_tweets = db.query(ProcessedTweet).join(Tweet).filter(
             ProcessedTweet.is_ai_related == True,
-            ProcessedTweet.processed_at >= start_datetime,
-            ProcessedTweet.processed_at <= end_datetime
+            Tweet.created_at >= start_datetime,
+            Tweet.created_at <= end_datetime
         ).order_by(ProcessedTweet.importance_score.desc()).all()
 
         if not ai_tweets:

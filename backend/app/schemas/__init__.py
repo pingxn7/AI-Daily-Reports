@@ -50,6 +50,8 @@ class TweetResponse(TweetBase):
     user_id: int
     collected_at: datetime
     processed: bool
+    # Account information
+    account: MonitoredAccountResponse
 
     model_config = ConfigDict(from_attributes=True)
 
