@@ -1,0 +1,35 @@
+================================================================================
+快速参考 - 添加 Twitter 账号
+================================================================================
+
+运行命令：
+  cd /Users/pingxn7/Desktop/x/backend
+  source venv/bin/activate
+  python scripts/manual_add_interactive.py
+
+查询网站：
+  https://tweeterid.com/
+
+操作流程：
+  1. 脚本显示账号名
+  2. 在 tweeterid.com 查询
+  3. 复制 user_id
+  4. 粘贴到脚本
+  5. 按回车
+
+快捷键：
+  s - 跳过当前账号
+  q - 退出脚本
+
+最重要的 5 个账号（优先添加）：
+  1. geoffreyhinton - 深度学习之父
+  2. Yoshua_Bengio - 图灵奖得主
+  3. aidangomez - Transformer 作者
+  4. gdb - OpenAI 联合创始人
+  5. NoamShazeer - Transformer 作者
+
+预计时间：
+  全部 21 个：20-30 分钟
+  前 5 个：5-10 分钟
+
+================================================================================
