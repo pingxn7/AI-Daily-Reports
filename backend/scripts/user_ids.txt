@@ -1,0 +1,32 @@
+# 请在每行填入: username user_id
+# 格式: username user_id
+# 例如: karpathy 17919972
+
+aidangomez
+karpathy 17919972
+DarioAmodei 739232892
+demishassabis 2735246778
+EpochAIResearch
+drfeifei
+fchollet 15002544
+geoffreyhinton
+gdb
+ilyasut 16616354
+indigox
+jackclarkSF
+JeffDean 11658782
+johnschulman2
+mustafasuleyman
+NoamShazeer
+OriolVinyalsML
+pabbeel
+rasbt
+SebastienBubeck
+soumithchintala
+woj_zaremba
+Yoshua_Bengio
+zephyr_z9
+AndrewYNg 1603818258
+_jasonwei
+lennysan
+thinkymachines

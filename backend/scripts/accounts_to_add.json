@@ -1,0 +1,142 @@
+[
+  {
+    "user_id": "17919972",
+    "username": "karpathy",
+    "display_name": "Andrej Karpathy"
+  },
+  {
+    "user_id": "1603818258",
+    "username": "AndrewYNg",
+    "display_name": "Andrew Ng"
+  },
+  {
+    "user_id": "15002544",
+    "username": "fchollet",
+    "display_name": "François Chollet"
+  },
+  {
+    "user_id": "2735246778",
+    "username": "demishassabis",
+    "display_name": "Demis Hassabis"
+  },
+  {
+    "user_id": "TODO",
+    "username": "aidangomez",
+    "display_name": "Aidan Gomez"
+  },
+  {
+    "user_id": "TODO",
+    "username": "DarioAmodei",
+    "display_name": "Dario Amodei"
+  },
+  {
+    "user_id": "TODO",
+    "username": "EpochAIResearch",
+    "display_name": "Epoch AI Research"
+  },
+  {
+    "user_id": "TODO",
+    "username": "drfeifei",
+    "display_name": "Fei-Fei Li"
+  },
+  {
+    "user_id": "TODO",
+    "username": "geoffreyhinton",
+    "display_name": "Geoffrey Hinton"
+  },
+  {
+    "user_id": "TODO",
+    "username": "gdb",
+    "display_name": "Greg Brockman"
+  },
+  {
+    "user_id": "TODO",
+    "username": "ilyasut",
+    "display_name": "Ilya Sutskever"
+  },
+  {
+    "user_id": "TODO",
+    "username": "indigox",
+    "display_name": "Indigo"
+  },
+  {
+    "user_id": "TODO",
+    "username": "jackclarkSF",
+    "display_name": "Jack Clark"
+  },
+  {
+    "user_id": "TODO",
+    "username": "JeffDean",
+    "display_name": "Jeff Dean"
+  },
+  {
+    "user_id": "TODO",
+    "username": "johnschulman2",
+    "display_name": "John Schulman"
+  },
+  {
+    "user_id": "TODO",
+    "username": "mustafasuleyman",
+    "display_name": "Mustafa Suleyman"
+  },
+  {
+    "user_id": "TODO",
+    "username": "NoamShazeer",
+    "display_name": "Noam Shazeer"
+  },
+  {
+    "user_id": "TODO",
+    "username": "OriolVinyalsML",
+    "display_name": "Oriol Vinyals"
+  },
+  {
+    "user_id": "TODO",
+    "username": "pabbeel",
+    "display_name": "Pieter Abbeel"
+  },
+  {
+    "user_id": "TODO",
+    "username": "rasbt",
+    "display_name": "Sebastian Raschka"
+  },
+  {
+    "user_id": "TODO",
+    "username": "SebastienBubeck",
+    "display_name": "Sebastien Bubeck"
+  },
+  {
+    "user_id": "TODO",
+    "username": "soumithchintala",
+    "display_name": "Soumith Chintala"
+  },
+  {
+    "user_id": "TODO",
+    "username": "woj_zaremba",
+    "display_name": "Wojciech Zaremba"
+  },
+  {
+    "user_id": "TODO",
+    "username": "Yoshua_Bengio",
+    "display_name": "Yoshua Bengio"
+  },
+  {
+    "user_id": "TODO",
+    "username": "zephyr_z9",
+    "display_name": "Zephyr"
+  },
+  {
+    "user_id": "TODO",
+    "username": "_jasonwei",
+    "display_name": "Jason Wei"
+  },
+  {
+    "user_id": "TODO",
+    "username": "lennysan",
+    "display_name": "Lenny"
+  },
+  {
+    "user_id": "TODO",
+    "username": "thinkymachines",
+    "display_name": "Thinky Machines"
+  }
+]

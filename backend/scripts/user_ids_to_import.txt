@@ -1,0 +1,10 @@
+# 示例文件 - 请替换为实际的 user_id
+# 格式: username user_id
+# 如何获取 user_id: 访问 https://tweeterid.com/ 输入 username
+
+# 示例（这些是示例 ID，请替换为实际 ID）:
+# swyx 33521530
+# karpathy 1270166613
+# elonmusk 44196397
+
+# 请在下面添加你的账号:

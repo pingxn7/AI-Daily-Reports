@@ -1,0 +1,72 @@
+[
+  {
+    "user_id": "17919972",
+    "username": "karpathy",
+    "display_name": "Andrej Karpathy"
+  },
+  {
+    "user_id": "1603818258",
+    "username": "AndrewYNg",
+    "display_name": "Andrew Ng"
+  },
+  {
+    "user_id": "15002544",
+    "username": "fchollet",
+    "display_name": "François Chollet"
+  },
+  {
+    "user_id": "2735246778",
+    "username": "demishassabis",
+    "display_name": "Demis Hassabis"
+  },
+  {
+    "user_id": "1467726470533754880",
+    "username": "sama",
+    "display_name": "Sam Altman"
+  },
+  {
+    "user_id": "33836629",
+    "username": "ylecun",
+    "display_name": "Yann LeCun"
+  },
+  {
+    "user_id": "92073489",
+    "username": "goodfellow_ian",
+    "display_name": "Ian Goodfellow"
+  },
+  {
+    "user_id": "1526228120",
+    "username": "DeepMind",
+    "display_name": "Google DeepMind"
+  },
+  {
+    "user_id": "1692398803",
+    "username": "GoogleAI",
+    "display_name": "Google AI"
+  },
+  {
+    "user_id": "2861417424",
+    "username": "OpenAI",
+    "display_name": "OpenAI"
+  },
+  {
+    "user_id": "1603818260",
+    "username": "AnthropicAI",
+    "display_name": "Anthropic"
+  },
+  {
+    "user_id": "44196397",
+    "username": "elonmusk",
+    "display_name": "Elon Musk"
+  },
+  {
+    "user_id": "1159274324",
+    "username": "hardmaru",
+    "display_name": "hardmaru"
+  },
+  {
+    "user_id": "2284730917",
+    "username": "arankomatsuzaki",
+    "display_name": "Aran Komatsuzaki"
+  }
+]

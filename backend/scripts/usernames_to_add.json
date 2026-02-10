@@ -1,0 +1,142 @@
+[
+  {
+    "username": "aidangomez",
+    "user_id": "请填入",
+    "display_name": "Aidan Gomez"
+  },
+  {
+    "username": "karpathy",
+    "user_id": "17919972",
+    "display_name": "Andrej Karpathy"
+  },
+  {
+    "username": "DarioAmodei",
+    "user_id": "请填入",
+    "display_name": "Dario Amodei"
+  },
+  {
+    "username": "demishassabis",
+    "user_id": "2735246778",
+    "display_name": "Demis Hassabis"
+  },
+  {
+    "username": "EpochAIResearch",
+    "user_id": "请填入",
+    "display_name": "Epoch AI Research"
+  },
+  {
+    "username": "drfeifei",
+    "user_id": "请填入",
+    "display_name": "Fei-Fei Li"
+  },
+  {
+    "username": "fchollet",
+    "user_id": "15002544",
+    "display_name": "François Chollet"
+  },
+  {
+    "username": "geoffreyhinton",
+    "user_id": "请填入",
+    "display_name": "Geoffrey Hinton"
+  },
+  {
+    "username": "gdb",
+    "user_id": "请填入",
+    "display_name": "Greg Brockman"
+  },
+  {
+    "username": "ilyasut",
+    "user_id": "请填入",
+    "display_name": "Ilya Sutskever"
+  },
+  {
+    "username": "indigox",
+    "user_id": "请填入",
+    "display_name": "Indigo"
+  },
+  {
+    "username": "jackclarkSF",
+    "user_id": "请填入",
+    "display_name": "Jack Clark"
+  },
+  {
+    "username": "JeffDean",
+    "user_id": "请填入",
+    "display_name": "Jeff Dean"
+  },
+  {
+    "username": "johnschulman2",
+    "user_id": "请填入",
+    "display_name": "John Schulman"
+  },
+  {
+    "username": "mustafasuleyman",
+    "user_id": "请填入",
+    "display_name": "Mustafa Suleyman"
+  },
+  {
+    "username": "NoamShazeer",
+    "user_id": "请填入",
+    "display_name": "Noam Shazeer"
+  },
+  {
+    "username": "OriolVinyalsML",
+    "user_id": "请填入",
+    "display_name": "Oriol Vinyals"
+  },
+  {
+    "username": "pabbeel",
+    "user_id": "请填入",
+    "display_name": "Pieter Abbeel"
+  },
+  {
+    "username": "rasbt",
+    "user_id": "请填入",
+    "display_name": "Sebastian Raschka"
+  },
+  {
+    "username": "SebastienBubeck",
+    "user_id": "请填入",
+    "display_name": "Sebastien Bubeck"
+  },
+  {
+    "username": "soumithchintala",
+    "user_id": "请填入",
+    "display_name": "Soumith Chintala"
+  },
+  {
+    "username": "woj_zaremba",
+    "user_id": "请填入",
+    "display_name": "Wojciech Zaremba"
+  },
+  {
+    "username": "Yoshua_Bengio",
+    "user_id": "请填入",
+    "display_name": "Yoshua Bengio"
+  },
+  {
+    "username": "zephyr_z9",
+    "user_id": "请填入",
+    "display_name": "Zephyr"
+  },
+  {
+    "username": "AndrewYNg",
+    "user_id": "1603818258",
+    "display_name": "Andrew Ng"
+  },
+  {
+    "username": "_jasonwei",
+    "user_id": "请填入",
+    "display_name": "Jason Wei"
+  },
+  {
+    "username": "lennysan",
+    "user_id": "请填入",
+    "display_name": "Lenny"
+  },
+  {
+    "username": "thinkymachines",
+    "user_id": "请填入",
+    "display_name": "Thinky Machines"
+  }
+]
