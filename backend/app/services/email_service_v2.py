@@ -65,35 +65,21 @@ class EmailService:
         """
         Parse event-based report format from AI-generated markdown.
 
-        Expected format:
-        ### 🔥 今日关键信息
-        - 【标签】信息内容
-
-        ### 📰 今日精选事件
-        #### 事件标题
-        事件概要
+        The AI generates format like:
+        ## 📰 今日精选事件
+        ### Event Title
+        Event summary
         #### 关键信息
-        - **@username (Name)** - 摘要
+        - **@username (Name)** - summary
           👍 Likes | 🔁 Reposts | ...
           [查看原文](url)
+
+        But the ### splits create alternating blocks of titles and "关键信息" sections.
 
         Returns:
             {
                 'key_highlights': [{'tag': '产品', 'text': '...'}],
-                'events': [
-                    {
-                        'title': '...',
-                        'summary': '...',
-                        'tweets': [
-                            {
-                                'author': '@username (Name)',
-                                'summary': '...',
-                                'metrics': {...},
-                                'url': '...'
-                            }
-                        ]
-                    }
-                ]
+                'events': [...]
             }
         """
         result = {
@@ -102,7 +88,7 @@ class EmailService:
         }
 
         # Parse key highlights
-        highlights_match = re.search(r'###\s*🔥\s*今日关键信息(.*?)(?=###|$)', markdown_text, re.DOTALL)
+        highlights_match = re.search(r'##\s*🔥\s*今日关键信息(.*?)(?=##|$)', markdown_text, re.DOTALL)
         if highlights_match:
             highlights_text = highlights_match.group(1)
             for line in highlights_text.split('\n'):
@@ -115,63 +101,64 @@ class EmailService:
                     })
 
         # Parse events section
-        events_match = re.search(r'###\s*📰\s*今日精选事件(.*?)$', markdown_text, re.DOTALL)
+        events_match = re.search(r'##\s*📰\s*今日精选事件(.*?)$', markdown_text, re.DOTALL)
         if not events_match:
             return result
 
         events_text = events_match.group(1)
 
-        # Split by #### to get event blocks
-        event_blocks = re.split(r'####\s*', events_text)
+        # Split by ### to get blocks
+        blocks = re.split(r'###\s+', events_text)
 
-        current_event = None
-        for block in event_blocks:
-            block = block.strip()
+        # Process blocks in pairs: title/summary block + 关键信息 block
+        i = 0
+        while i < len(blocks):
+            block = blocks[i].strip()
             if not block:
+                i += 1
                 continue
 
-            # Check if this is "关键信息" section
-            if block.startswith('关键信息'):
-                if current_event:
-                    # Parse tweets in this section
-                    # Pattern: - **@username (Name)** - summary\n  metrics\n  [link](url)
-                    tweet_pattern = r'-\s*\*\*(@\w+)\s*\(([^)]+)\)\*\*\s*-\s*([^\n]+)\n\s*👍\s*(\d+)\s*\|\s*🔁\s*(\d+)\s*\|\s*💬\s*(\d+)\s*\|\s*🔖\s*(\d+)\s*\n\s*\[查看原文\]\(([^)]+)\)'
-
-                    for tweet_match in re.finditer(tweet_pattern, block):
-                        current_event['tweets'].append({
-                            'author': f'{tweet_match.group(1)} ({tweet_match.group(2)})',
-                            'summary': tweet_match.group(3).strip(),
-                            'metrics': {
-                                'likes': int(tweet_match.group(4)),
-                                'retweets': int(tweet_match.group(5)),
-                                'replies': int(tweet_match.group(6)),
-                                'bookmarks': int(tweet_match.group(7))
-                            },
-                            'url': tweet_match.group(8)
-                        })
-            else:
-                # This is an event title and summary
-                # Save previous event if exists
-                if current_event:
-                    result['events'].append(current_event)
-
-                # Parse title (first line) and summary (rest)
+            # Check if this is a title/summary block (not starting with "关键信息")
+            if not block.startswith('关键信息'):
+                # This is a title/summary block
                 lines = block.split('\n', 1)
                 title = lines[0].strip()
                 summary = lines[1].strip() if len(lines) > 1 else ''
 
-                # Remove any "#### 关键信息" from summary
-                summary = re.sub(r'####\s*关键信息.*$', '', summary, flags=re.DOTALL).strip()
+                # Remove any "####" markers from summary
+                summary = re.sub(r'####.*$', '', summary, flags=re.DOTALL).strip()
 
-                current_event = {
+                # Look for the next block which should be "关键信息"
+                tweets = []
+                if i + 1 < len(blocks):
+                    next_block = blocks[i + 1].strip()
+                    if next_block.startswith('关键信息'):
+                        # Parse tweets from this block
+                        tweet_pattern = r'-\s*\*\*(@\w+)\s*\(([^)]+)\)\*\*\s*-\s*([^\n]+)\n\s*👍\s*([\d,]+)\s*\|\s*🔁\s*([\d,]+)\s*\|\s*💬\s*([\d,]+)\s*\|\s*🔖\s*([\d,]+)\s*\n\s*\[查看原文\]\(([^)]+)\)'
+
+                        for tweet_match in re.finditer(tweet_pattern, next_block):
+                            tweets.append({
+                                'author': f'{tweet_match.group(1)} ({tweet_match.group(2)})',
+                                'summary': tweet_match.group(3).strip(),
+                                'metrics': {
+                                    'likes': int(tweet_match.group(4).replace(',', '')),
+                                    'retweets': int(tweet_match.group(5).replace(',', '')),
+                                    'replies': int(tweet_match.group(6).replace(',', '')),
+                                    'bookmarks': int(tweet_match.group(7).replace(',', ''))
+                                },
+                                'url': tweet_match.group(8)
+                            })
+
+                        i += 1  # Skip the next block since we processed it
+
+                # Add event
+                result['events'].append({
                     'title': title,
                     'summary': summary,
-                    'tweets': []
-                }
+                    'tweets': tweets
+                })
 
-        # Add last event
-        if current_event:
-            result['events'].append(current_event)
+            i += 1
 
         return result
 
