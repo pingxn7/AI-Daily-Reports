@@ -17,7 +17,7 @@ python-dotenv==1.0.0
 apscheduler==3.10.4
 
 # AI/ML
-anthropic==0.18.1
+anthropic==0.25.0
 
 # Email
 resend==0.7.0
