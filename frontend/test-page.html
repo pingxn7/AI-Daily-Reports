@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>Testing API</h1>
+    <div id="result"></div>
+    <script>
+        const resultDiv = document.getElementById('result');
+        
+        fetch('http://localhost:8000/api/summaries/4')
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Data received:', data);
+                resultDiv.innerHTML = '<pre>' + JSON.stringify(data, null, 2).substring(0, 500) + '</pre>';
+                resultDiv.innerHTML += '<p style="color: green;">✓ API call successful!</p>';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                resultDiv.innerHTML = '<p style="color: red;">✗ Error: ' + error.message + '</p>';
+            });
+    </script>
+</body>
+</html>

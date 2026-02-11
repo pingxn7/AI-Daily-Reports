@@ -70,25 +70,69 @@ class AggregatorService:
 
         # Prepare tweets for summarization
         tweets_text = "\n\n".join([
-            f"Tweet {i+1} by @{tweet.tweet.account.username}:\n"
+            f"Tweet {i+1} by @{tweet.tweet.account.username} ({tweet.tweet.account.display_name}):\n"
             f"Summary: {tweet.summary}\n"
-            f"Engagement: {tweet.tweet.like_count} likes, {tweet.tweet.retweet_count} retweets\n"
+            f"Likes: {tweet.tweet.like_count}, Retweets: {tweet.tweet.retweet_count}, "
+            f"Replies: {tweet.tweet.reply_count}, Bookmarks: {tweet.tweet.bookmark_count}\n"
+            f"Tweet URL: {tweet.tweet.tweet_url}\n"
             f"Importance: {tweet.importance_score}/10"
             for i, tweet in enumerate(top_tweets)
         ])
 
-        prompt = f"""Based on the following top 10 AI news tweets from today, create a concise highlights summary in Chinese.
+        prompt = f"""基于以下 10 条 AI 新闻推文，生成一份按事件聚合的中文摘要报告。
 
-The summary should:
-1. Start with a brief overview paragraph (2-3 sentences) of the key themes and developments
-2. Follow with 3-5 bullet points highlighting the most important insights
-3. Be written in a professional, informative tone
-4. Focus on what's new, important, or trending in AI
+要求：
+1. 将相关推文按事件主题聚合（如：新模型发布、产品更新、公司动态等）
+2. 每个事件包含：事件标题、事件总结、相关推文信息
+3. 严格使用以下格式：
 
-Top 10 Tweets:
+## 🔥 今日关键信息
+
+- 【模型】简短描述模型相关的关键信息（一段话，突出核心亮点）
+- 【产品】简短描述产品相关的关键信息（一段话，突出核心亮点）
+- 【公司】简短描述公司相关的关键信息（一段话，突出核心亮点）
+- 【应用】简短描述应用相关的关键信息（一段话，突出核心亮点）
+- 【市场】简短描述市场相关的关键信息（一段话，突出核心亮点）
+
+（标签可以是：模型、产品、公司、应用、市场、融资、研究、开源等，每个亮点是一段关键信息）
+
+## 📰 今日精选事件
+
+### 事件标题1
+
+事件的中文总结（2-3句话，描述这个事件的核心内容和意义）
+
+#### 关键信息
+
+- **@username (Display Name)** - 这条推文的中文摘要（提取核心观点，不需要原文）
+👍 1,234 | 🔁 567 | 💬 89 | 🔖 123
+[查看原文](实际的推文URL)
+
+注意：必须使用推文数据中提供的 Tweet URL，不要使用 twitter.com/username 这样的个人主页链接
+
+- **@username2 (Display Name)** - 另一条相关推文的中文摘要
+👍 2,345 | 🔁 678 | 💬 90 | 🔖 234
+[查看原文](tweet_url)
+
+### 事件标题2
+
+事件的中文总结...
+
+#### 关键信息
+
+- **@username (Display Name)** - 推文摘要
+👍 xxx | 🔁 xxx | 💬 xxx | 🔖 xxx
+[查看原文](url)
+
+推文数据：
 {tweets_text}
 
-Provide the summary in Chinese (Simplified):"""
+请严格按照上述格式生成报告，确保：
+1. 今日关键信息部分：只列出5-8个核心亮点，每个用【标签】开头，每个亮点是一段关键信息
+2. 今日精选事件部分：将推文按主题聚合成3-5个事件，每个事件下列出2-3条最相关的推文
+3. 推文信息必须包含：作者、中文摘要（不需要原文）、点赞、评论、回复、转发、原文链接
+4. 全部使用中文，专业且简洁
+5. 不要在开头添加整体摘要段落"""
 
         try:
             message = self.client.messages.create(
@@ -204,9 +248,11 @@ Provide the summary in Chinese (Simplified):"""
             f"{len(other_tweets)} other tweets"
         )
 
-        # Translate top tweets only
+        # Translate top tweets and first 10 other tweets
         top_tweet_ids = [tweet.id for tweet in top_tweets]
-        await ai_analyzer.translate_top_tweets(db, top_tweet_ids)
+        other_tweet_ids = [tweet.id for tweet in other_tweets[:10]]  # 只翻译前10条
+        all_tweet_ids = top_tweet_ids + other_tweet_ids
+        await ai_analyzer.translate_top_tweets(db, all_tweet_ids)
 
         # Generate screenshots for highlights only
         await screenshot_service.generate_screenshots_for_highlights(db, summary.id)

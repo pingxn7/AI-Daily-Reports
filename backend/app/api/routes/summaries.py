@@ -3,7 +3,7 @@ API routes for summaries and tweets.
 """
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import func, desc
+from sqlalchemy import func, desc, text
 from typing import List, Optional
 from datetime import datetime
 import math
@@ -30,7 +30,7 @@ async def health_check(db: Session = Depends(get_db)):
     """
     # Check database connection
     try:
-        db.execute("SELECT 1")
+        db.execute(text("SELECT 1"))
         db_status = "healthy"
     except Exception as e:
         db_status = f"unhealthy: {str(e)}"

@@ -391,44 +391,6 @@ export const EventBasedSummary = React.memo<EventBasedSummaryProps>(({
         </FadeIn>
       )}
 
-      {/* Topics Section */}
-      {topics && topics.length > 0 && (
-        <FadeIn delay={600}>
-          <section className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-200 shadow-md">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl p-2.5 shadow-sm">
-                <span className="text-2xl">🏷️</span>
-              </div>
-              <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                热门话题
-              </h3>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {topics.slice(0, 15).map((topic, index) => {
-                const colors = [
-                  'from-blue-500 to-cyan-500',
-                  'from-purple-500 to-pink-500',
-                  'from-green-500 to-emerald-500',
-                  'from-orange-500 to-red-500',
-                  'from-indigo-500 to-violet-500',
-                  'from-rose-500 to-pink-500',
-                ];
-                const colorClass = colors[index % colors.length];
-
-                return (
-                  <span
-                    key={index}
-                    className={`inline-flex items-center px-3 py-1.5 bg-gradient-to-r ${colorClass} text-white rounded-full text-xs font-bold shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer`}
-                  >
-                    #{topic}
-                  </span>
-                );
-              })}
-            </div>
-          </section>
-        </FadeIn>
-      )}
-
       {/* Fallback for plain text if parsing fails */}
       {parsed.keyHighlights.length === 0 && parsed.events.length === 0 && (
         <FadeIn>

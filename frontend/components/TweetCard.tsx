@@ -229,9 +229,9 @@ export function TweetCard({ tweet, variant }: TweetCardProps) {
             </span>
           </div>
 
-          {/* Summary */}
+          {/* Content - 优先显示中文翻译 */}
           <p className="text-sm text-gray-700 mb-3 line-clamp-2 leading-relaxed">
-            {tweet.summary || tweet.tweet.text}
+            {tweet.translation || tweet.tweet.text}
           </p>
 
           {/* Topics (compact) */}
