@@ -55,8 +55,8 @@ class Settings(BaseSettings):
 
     # Scheduled Tasks
     schedule_tweet_collection_cron: str = "0 */2 * * *"  # Every 2 hours
-    schedule_daily_summary_cron: str = "0 8 * * *"       # Daily at 8 AM
-    schedule_timezone: str = "UTC"
+    schedule_daily_summary_cron: str = "0 8 * * *"       # Daily at 8 AM Beijing time
+    schedule_timezone: str = "Asia/Shanghai"
 
     # Logging
     log_level: str = "INFO"

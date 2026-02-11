@@ -424,8 +424,8 @@ EMAIL_TO=your-email@example.com
 
 # 定时任务
 SCHEDULE_TWEET_COLLECTION_CRON=0 */2 * * *  # 每2小时
-SCHEDULE_DAILY_SUMMARY_CRON=0 8 * * *       # 每天8:00
-SCHEDULE_TIMEZONE=UTC                        # 时区
+SCHEDULE_DAILY_SUMMARY_CRON=0 8 * * *       # 每天北京时间8:00
+SCHEDULE_TIMEZONE=Asia/Shanghai              # 时区（北京时间）
 
 # 功能开关
 ENABLE_TRANSLATION=True
@@ -746,13 +746,18 @@ pytest
 
 **修改为北京时间 8:00**:
 ```bash
-# 方式 1: 修改时区
+# 当前配置：北京时间早上 8 点
 SCHEDULE_TIMEZONE=Asia/Shanghai
 SCHEDULE_DAILY_SUMMARY_CRON=0 8 * * *
 
-# 方式 2: 保持 UTC，调整时间
+# 其他时区示例
+# UTC 时间（需要调整小时数）
 SCHEDULE_TIMEZONE=UTC
 SCHEDULE_DAILY_SUMMARY_CRON=0 0 * * *  # UTC 0:00 = 北京 8:00
+
+# 美国东部时间
+SCHEDULE_TIMEZONE=America/New_York
+SCHEDULE_DAILY_SUMMARY_CRON=0 8 * * *  # 纽约时间 8:00
 ```
 
 ---
