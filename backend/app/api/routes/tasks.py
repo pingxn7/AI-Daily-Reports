@@ -222,11 +222,16 @@ async def create_test_data(
             created_count += 1
 
         db.commit()
-        db.flush()  # Ensure data is written
 
-        # Verify tweets were created
-        from app.models.tweet import Tweet as TweetModel
-        actual_count = db.query(TweetModel).filter(TweetModel.processed == False).count()
+        # Verify tweets were created in a new session
+        db.close()
+        from app.database import SessionLocal
+        verify_db = SessionLocal()
+        try:
+            from app.models.tweet import Tweet as TweetModel
+            actual_count = verify_db.query(TweetModel).filter(TweetModel.processed == False).count()
+        finally:
+            verify_db.close()
 
         return {
             "status": "success",
