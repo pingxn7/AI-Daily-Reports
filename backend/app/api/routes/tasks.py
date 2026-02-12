@@ -124,6 +124,88 @@ async def trigger_summary(
         }
 
 
+@router.post("/create-test-data")
+async def create_test_data(
+    db: Session = Depends(get_db)
+) -> Dict[str, Any]:
+    """
+    Create test data for demonstration purposes.
+
+    This will create sample tweets and process them.
+
+    Returns:
+        Status message
+    """
+    from app.models.tweet import Tweet
+    from app.models.monitored_account import MonitoredAccount
+    from datetime import datetime, timedelta
+    import random
+
+    try:
+        # Sample tweets
+        sample_tweets = [
+            {"text": "Excited to announce GPT-5 will be released next month with groundbreaking multimodal capabilities!", "likes": 15000, "retweets": 3500, "replies": 890, "bookmarks": 2100},
+            {"text": "Our new AI model achieves 95% accuracy on complex reasoning tasks. Paper coming soon!", "likes": 8900, "retweets": 2100, "replies": 450, "bookmarks": 1200},
+            {"text": "Just published: 'Scaling Laws for Neural Language Models' - fascinating insights on model performance", "likes": 5600, "retweets": 1800, "replies": 320, "bookmarks": 980},
+            {"text": "AI safety research is more important than ever. We need robust alignment techniques before AGI.", "likes": 12000, "retweets": 4200, "replies": 1100, "bookmarks": 3400},
+            {"text": "New breakthrough in computer vision: our model can now understand 3D scenes from single images", "likes": 7800, "retweets": 2300, "replies": 560, "bookmarks": 1500},
+            {"text": "Just tried the new Claude 3.5 Sonnet - the coding capabilities are incredible!", "likes": 9200, "retweets": 2800, "replies": 650, "bookmarks": 1900},
+            {"text": "Machine learning is revolutionizing drug discovery. Excited about the future of AI in healthcare!", "likes": 11000, "retweets": 3100, "replies": 890, "bookmarks": 2500},
+            {"text": "Open source AI models are democratizing access to powerful technology. This is huge!", "likes": 13000, "retweets": 4100, "replies": 1200, "bookmarks": 3100},
+            {"text": "Neural networks can now generate photorealistic images from text descriptions. Mind-blowing!", "likes": 16000, "retweets": 4800, "replies": 1400, "bookmarks": 3800},
+            {"text": "AI-powered code completion is changing how we write software. Productivity gains are real.", "likes": 9800, "retweets": 2900, "replies": 720, "bookmarks": 2000},
+        ]
+
+        # Get accounts
+        accounts = db.query(MonitoredAccount).filter(MonitoredAccount.is_active == True).all()
+        if not accounts:
+            return {"status": "error", "message": "No monitored accounts found"}
+
+        # Create tweets
+        created_count = 0
+        base_time = datetime.utcnow() - timedelta(hours=12)
+
+        for i, tweet_data in enumerate(sample_tweets):
+            account = random.choice(accounts)
+            engagement_score = (
+                tweet_data["likes"] * 1.0 +
+                tweet_data["retweets"] * 2.0 +
+                tweet_data["replies"] * 1.5 +
+                tweet_data["bookmarks"] * 2.5
+            )
+
+            tweet = Tweet(
+                tweet_id=f"test_{random.randint(100000, 999999)}",
+                user_id=account.id,
+                text=tweet_data["text"],
+                created_at=base_time + timedelta(minutes=i*30),
+                tweet_url=f"https://twitter.com/{account.username}/status/test_{i+1}",
+                like_count=tweet_data["likes"],
+                retweet_count=tweet_data["retweets"],
+                reply_count=tweet_data["replies"],
+                bookmark_count=tweet_data["bookmarks"],
+                engagement_score=engagement_score,
+                processed=False
+            )
+            db.add(tweet)
+            created_count += 1
+
+        db.commit()
+
+        return {
+            "status": "success",
+            "message": f"Created {created_count} test tweets",
+            "created": created_count
+        }
+
+    except Exception as e:
+        db.rollback()
+        return {
+            "status": "error",
+            "message": f"Error creating test data: {str(e)}"
+        }
+
+
 @router.post("/full-run")
 async def trigger_full_run(
     summary_date: str = None,
