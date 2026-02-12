@@ -2,7 +2,6 @@
 Screenshot service - Generate screenshots of tweets using Playwright.
 Only generates screenshots for top 10 curated tweets to save costs.
 """
-from playwright.async_api import async_playwright, Browser, Page
 from typing import Optional
 import boto3
 from botocore.exceptions import ClientError
@@ -12,6 +11,16 @@ from loguru import logger
 from io import BytesIO
 
 from app.config import settings
+
+# Try to import playwright, but gracefully degrade if not available
+try:
+    from playwright.async_api import async_playwright, Browser, Page
+    PLAYWRIGHT_AVAILABLE = True
+except ImportError:
+    logger.warning("Playwright not installed - screenshot functionality will be disabled")
+    PLAYWRIGHT_AVAILABLE = False
+    Browser = None
+    Page = None
 
 
 class ScreenshotService:
@@ -30,6 +39,10 @@ class ScreenshotService:
 
     async def init_browser(self):
         """Initialize Playwright browser."""
+        if not PLAYWRIGHT_AVAILABLE:
+            logger.warning("Playwright not available - cannot initialize browser")
+            return
+
         if not self.browser:
             playwright = await async_playwright().start()
             self.browser = await playwright.chromium.launch(
@@ -54,6 +67,10 @@ class ScreenshotService:
         Returns:
             Screenshot image bytes or None if error
         """
+        if not PLAYWRIGHT_AVAILABLE:
+            logger.debug("Playwright not available - skipping screenshot")
+            return None
+
         if not settings.enable_screenshot:
             logger.info("Screenshot generation disabled")
             return None
