@@ -20,7 +20,7 @@ apscheduler==3.10.4
 anthropic==0.42.0
 
 # Email
-resend==2.5.0
+resend==2.5.1
 
 # HTTP Client
 httpx==0.28.1
