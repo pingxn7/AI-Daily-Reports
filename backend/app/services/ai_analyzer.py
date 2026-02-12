@@ -176,6 +176,9 @@ Provide only the translation, no explanations."""
 
         # Calculate max engagement for normalization
         max_engagement = max(tweet.engagement_score for tweet in unprocessed_tweets) if unprocessed_tweets else 1.0
+        # Ensure max_engagement is never 0 to avoid division by zero
+        if max_engagement == 0:
+            max_engagement = 1.0
 
         # Process in batches
         total_processed = 0
