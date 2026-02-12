@@ -124,6 +124,39 @@ async def trigger_summary(
         }
 
 
+@router.get("/debug/tweets")
+async def debug_tweets(
+    db: Session = Depends(get_db)
+) -> Dict[str, Any]:
+    """
+    Debug endpoint to check raw tweets in database.
+    """
+    from app.models.tweet import Tweet as TweetModel
+
+    total_tweets = db.query(TweetModel).count()
+    unprocessed_tweets = db.query(TweetModel).filter(TweetModel.processed == False).count()
+    processed_tweets = db.query(TweetModel).filter(TweetModel.processed == True).count()
+
+    # Get sample tweets
+    sample = db.query(TweetModel).limit(3).all()
+    sample_data = [
+        {
+            "id": t.id,
+            "tweet_id": t.tweet_id,
+            "text": t.text[:50] + "...",
+            "processed": t.processed
+        }
+        for t in sample
+    ]
+
+    return {
+        "total_tweets": total_tweets,
+        "unprocessed": unprocessed_tweets,
+        "processed": processed_tweets,
+        "sample": sample_data
+    }
+
+
 @router.post("/process-tweets")
 async def process_existing_tweets(
     db: Session = Depends(get_db)
