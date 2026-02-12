@@ -168,20 +168,27 @@ async def process_existing_tweets(
         Processing results
     """
     from app.services.ai_analyzer import ai_analyzer
+    from app.models.tweet import Tweet as TweetModel
 
     try:
+        # Check how many unprocessed tweets exist
+        unprocessed_count = db.query(TweetModel).filter(TweetModel.processed == False).count()
+
         processed_count = await ai_analyzer.process_unprocessed_tweets(db)
 
         return {
             "status": "success",
             "message": f"Processed {processed_count} tweets",
-            "processed": processed_count
+            "processed": processed_count,
+            "unprocessed_before": unprocessed_count
         }
 
     except Exception as e:
+        import traceback
         return {
             "status": "error",
-            "message": f"Error processing tweets: {str(e)}"
+            "message": f"Error processing tweets: {str(e)}",
+            "traceback": traceback.format_exc()
         }
 
 
