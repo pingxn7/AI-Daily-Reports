@@ -3,8 +3,6 @@ Screenshot service - Generate screenshots of tweets using Playwright.
 Only generates screenshots for top 10 curated tweets to save costs.
 """
 from typing import Optional
-import boto3
-from botocore.exceptions import ClientError
 from datetime import datetime
 import hashlib
 from loguru import logger
@@ -22,13 +20,23 @@ except ImportError:
     Browser = None
     Page = None
 
+# Try to import boto3, but gracefully degrade if not available
+try:
+    import boto3
+    from botocore.exceptions import ClientError
+    BOTO3_AVAILABLE = True
+except ImportError:
+    logger.warning("boto3 not installed - S3 upload functionality will be disabled")
+    BOTO3_AVAILABLE = False
+    ClientError = Exception
+
 
 class ScreenshotService:
     """Service to generate and store tweet screenshots."""
 
     def __init__(self):
         self.s3_client = None
-        if settings.aws_access_key_id and settings.aws_secret_access_key:
+        if BOTO3_AVAILABLE and settings.aws_access_key_id and settings.aws_secret_access_key:
             self.s3_client = boto3.client(
                 's3',
                 aws_access_key_id=settings.aws_access_key_id,
@@ -119,6 +127,10 @@ class ScreenshotService:
         Returns:
             S3 URL or None if error
         """
+        if not BOTO3_AVAILABLE:
+            logger.debug("boto3 not available - skipping S3 upload")
+            return None
+
         if not self.s3_client or not settings.aws_s3_bucket:
             logger.warning("S3 not configured, skipping upload")
             return None
