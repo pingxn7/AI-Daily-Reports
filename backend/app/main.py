@@ -9,7 +9,7 @@ import sys
 
 from app.config import settings
 from app.database import init_db
-from app.api.routes import summaries, accounts, scheduler
+from app.api.routes import summaries, accounts, scheduler, tasks
 from app.tasks.scheduler import start_scheduler, stop_scheduler
 
 
@@ -77,6 +77,7 @@ app.add_middleware(
 app.include_router(summaries.router)
 app.include_router(accounts.router)
 app.include_router(scheduler.router)
+app.include_router(tasks.router)
 
 
 @app.get("/")
