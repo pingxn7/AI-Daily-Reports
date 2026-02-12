@@ -193,6 +193,9 @@ async def create_test_data(
         created_count = 0
         base_time = datetime.utcnow() - timedelta(hours=12)
 
+        # Use timestamp to ensure unique tweet IDs
+        timestamp = int(datetime.utcnow().timestamp())
+
         for i, tweet_data in enumerate(sample_tweets):
             account = random.choice(accounts)
             engagement_score = (
@@ -203,11 +206,11 @@ async def create_test_data(
             )
 
             tweet = Tweet(
-                tweet_id=f"test_{random.randint(100000, 999999)}",
+                tweet_id=f"test_{timestamp}_{i}_{random.randint(1000, 9999)}",
                 user_id=account.id,
                 text=tweet_data["text"],
                 created_at=base_time + timedelta(minutes=i*30),
-                tweet_url=f"https://twitter.com/{account.username}/status/test_{i+1}",
+                tweet_url=f"https://twitter.com/{account.username}/status/test_{timestamp}_{i}",
                 like_count=tweet_data["likes"],
                 retweet_count=tweet_data["retweets"],
                 reply_count=tweet_data["replies"],
