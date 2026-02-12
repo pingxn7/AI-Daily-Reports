@@ -222,18 +222,26 @@ async def create_test_data(
             created_count += 1
 
         db.commit()
+        db.flush()  # Ensure data is written
+
+        # Verify tweets were created
+        from app.models.tweet import Tweet as TweetModel
+        actual_count = db.query(TweetModel).filter(TweetModel.processed == False).count()
 
         return {
             "status": "success",
             "message": f"Created {created_count} test tweets",
-            "created": created_count
+            "created": created_count,
+            "verified_count": actual_count
         }
 
     except Exception as e:
         db.rollback()
+        import traceback
         return {
             "status": "error",
-            "message": f"Error creating test data: {str(e)}"
+            "message": f"Error creating test data: {str(e)}",
+            "traceback": traceback.format_exc()
         }
 
 
