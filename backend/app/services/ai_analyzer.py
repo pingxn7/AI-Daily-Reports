@@ -170,6 +170,8 @@ Provide only the translation, no explanations."""
             Tweet.processed == False
         ).order_by(Tweet.created_at.desc()).limit(batch_size * 10).all()
 
+        logger.info(f"Found {len(unprocessed_tweets)} unprocessed tweets")
+
         if not unprocessed_tweets:
             logger.info("No unprocessed tweets found")
             return 0
