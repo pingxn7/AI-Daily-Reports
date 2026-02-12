@@ -230,9 +230,10 @@ Provide only the translation, no explanations."""
             db.commit()
             logger.info(f"Batch {i//batch_size + 1} complete: {len(batch)} tweets processed")
 
+        percentage = (ai_related_count/total_processed*100) if total_processed > 0 else 0
         logger.info(
             f"AI analysis complete: {total_processed} tweets processed, "
-            f"{ai_related_count} AI-related ({ai_related_count/total_processed*100:.1f}%)"
+            f"{ai_related_count} AI-related ({percentage:.1f}%)"
         )
 
         return total_processed
