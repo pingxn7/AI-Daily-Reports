@@ -124,6 +124,34 @@ async def trigger_summary(
         }
 
 
+@router.post("/process-tweets")
+async def process_existing_tweets(
+    db: Session = Depends(get_db)
+) -> Dict[str, Any]:
+    """
+    Process existing unprocessed tweets with AI analysis.
+
+    Returns:
+        Processing results
+    """
+    from app.services.ai_analyzer import ai_analyzer
+
+    try:
+        processed_count = await ai_analyzer.process_unprocessed_tweets(db)
+
+        return {
+            "status": "success",
+            "message": f"Processed {processed_count} tweets",
+            "processed": processed_count
+        }
+
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Error processing tweets: {str(e)}"
+        }
+
+
 @router.post("/create-test-data")
 async def create_test_data(
     db: Session = Depends(get_db)
