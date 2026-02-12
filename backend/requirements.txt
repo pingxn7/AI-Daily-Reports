@@ -1,32 +1,32 @@
 # Web Framework
-fastapi==0.109.0
-uvicorn==0.27.0
-python-multipart==0.0.6
+fastapi==0.115.0
+uvicorn==0.32.0
+python-multipart==0.0.12
 
 # Database
-sqlalchemy==2.0.25
-alembic==1.13.1
-psycopg2-binary==2.9.9
+sqlalchemy==2.0.36
+alembic==1.14.0
+psycopg2-binary==2.9.10
 
 # Configuration
-pydantic==2.5.3
-pydantic-settings==2.1.0
-python-dotenv==1.0.0
+pydantic==2.10.3
+pydantic-settings==2.6.1
+python-dotenv==1.0.1
 
 # Scheduling
 apscheduler==3.10.4
 
 # AI/ML
-anthropic==0.25.0
+anthropic==0.42.0
 
 # Email
-resend==0.7.0
+resend==2.5.0
 
 # HTTP Client
-httpx==0.26.0
+httpx==0.28.1
 
 # Logging
-loguru==0.7.2
+loguru==0.7.3
 
 # Utilities
-python-dateutil==2.8.2
+python-dateutil==2.9.0
