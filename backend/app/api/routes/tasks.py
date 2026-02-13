@@ -129,10 +129,17 @@ async def test_claude_api() -> Dict[str, Any]:
     """
     Test if Claude API is working.
     """
-    try:
-        import anthropic
-        from app.config import settings
+    import anthropic
+    from app.config import settings
 
+    api_key_info = {
+        "configured": bool(settings.anthropic_api_key),
+        "length": len(settings.anthropic_api_key) if settings.anthropic_api_key else 0,
+        "prefix": settings.anthropic_api_key[:15] + "..." if settings.anthropic_api_key and len(settings.anthropic_api_key) > 15 else None,
+        "starts_with_sk": settings.anthropic_api_key.startswith("sk-") if settings.anthropic_api_key else False
+    }
+
+    try:
         client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
 
         message = client.messages.create(
@@ -143,8 +150,7 @@ async def test_claude_api() -> Dict[str, Any]:
 
         return {
             "status": "success",
-            "api_key_configured": bool(settings.anthropic_api_key),
-            "api_key_prefix": settings.anthropic_api_key[:10] + "..." if settings.anthropic_api_key else None,
+            "api_key_info": api_key_info,
             "model": settings.claude_model,
             "response": message.content[0].text
         }
@@ -152,6 +158,7 @@ async def test_claude_api() -> Dict[str, Any]:
         import traceback
         return {
             "status": "error",
+            "api_key_info": api_key_info,
             "message": str(e),
             "traceback": traceback.format_exc()
         }
