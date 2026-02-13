@@ -415,3 +415,89 @@ async def trigger_full_run(
             "message": f"Error during full run: {str(e)}",
             "results": results if 'results' in locals() else {}
         }
+
+
+@router.post("/send-email")
+async def send_summary_email(
+    summary_id: int = None,
+    summary_date: str = None,
+    db: Session = Depends(get_db)
+) -> Dict[str, Any]:
+    """
+    Send email for an existing summary.
+
+    Args:
+        summary_id: Summary ID (optional)
+        summary_date: Date in YYYY-MM-DD format (optional, defaults to latest)
+
+    Returns:
+        Email sending status
+    """
+    from app.models.daily_summary import DailySummary
+    from app.services.email_service_v2 import email_service
+    from app.services.aggregator import aggregator_service
+    from sqlalchemy import desc
+
+    try:
+        # Find summary
+        if summary_id:
+            summary = db.query(DailySummary).filter(DailySummary.id == summary_id).first()
+        elif summary_date:
+            target_date = date.fromisoformat(summary_date)
+            summary = db.query(DailySummary).filter(DailySummary.date == target_date).first()
+        else:
+            # Get latest summary
+            summary = db.query(DailySummary).order_by(desc(DailySummary.date)).first()
+
+        if not summary:
+            return {
+                "status": "error",
+                "message": "Summary not found"
+            }
+
+        # Get summary with tweets
+        summary_data = await aggregator_service.get_summary_with_tweets(db, summary.id)
+
+        if not summary_data:
+            return {
+                "status": "error",
+                "message": "Failed to load summary data"
+            }
+
+        # Send email
+        email_sent = await email_service.send_daily_digest(
+            summary=summary_data["summary"],
+            highlights=summary_data["highlights"]
+        )
+
+        if email_sent:
+            # Update email sent timestamp
+            from datetime import datetime
+            from app.config import settings
+            summary.email_sent_at = datetime.now()
+            summary.email_recipient = settings.email_to
+            db.commit()
+
+            return {
+                "status": "success",
+                "message": f"Email sent successfully for {summary.date}",
+                "summary": {
+                    "id": summary.id,
+                    "date": str(summary.date),
+                    "email_recipient": summary.email_recipient,
+                    "email_sent_at": str(summary.email_sent_at)
+                }
+            }
+        else:
+            return {
+                "status": "error",
+                "message": "Failed to send email"
+            }
+
+    except Exception as e:
+        import traceback
+        return {
+            "status": "error",
+            "message": f"Error sending email: {str(e)}",
+            "traceback": traceback.format_exc()
+        }
