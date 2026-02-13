@@ -124,6 +124,39 @@ async def trigger_summary(
         }
 
 
+@router.get("/debug/test-claude")
+async def test_claude_api() -> Dict[str, Any]:
+    """
+    Test if Claude API is working.
+    """
+    try:
+        import anthropic
+        from app.config import settings
+
+        client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
+
+        message = client.messages.create(
+            model=settings.claude_model,
+            max_tokens=100,
+            messages=[{"role": "user", "content": "Say hello"}]
+        )
+
+        return {
+            "status": "success",
+            "api_key_configured": bool(settings.anthropic_api_key),
+            "api_key_prefix": settings.anthropic_api_key[:10] + "..." if settings.anthropic_api_key else None,
+            "model": settings.claude_model,
+            "response": message.content[0].text
+        }
+    except Exception as e:
+        import traceback
+        return {
+            "status": "error",
+            "message": str(e),
+            "traceback": traceback.format_exc()
+        }
+
+
 @router.get("/debug/tweets")
 async def debug_tweets(
     db: Session = Depends(get_db)
