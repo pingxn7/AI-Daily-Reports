@@ -34,6 +34,7 @@ class Settings(BaseSettings):
 
     # Claude API
     anthropic_api_key: str
+    anthropic_base_url: Optional[str] = None  # For API proxy/relay
     claude_model: str = "claude-3-5-sonnet-20241022"
     claude_max_tokens: int = 4096
 

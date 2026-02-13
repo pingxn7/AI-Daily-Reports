@@ -136,11 +136,17 @@ async def test_claude_api() -> Dict[str, Any]:
         "configured": bool(settings.anthropic_api_key),
         "length": len(settings.anthropic_api_key) if settings.anthropic_api_key else 0,
         "prefix": settings.anthropic_api_key[:15] + "..." if settings.anthropic_api_key and len(settings.anthropic_api_key) > 15 else None,
-        "starts_with_sk": settings.anthropic_api_key.startswith("sk-") if settings.anthropic_api_key else False
+        "starts_with_sk": settings.anthropic_api_key.startswith("sk-") if settings.anthropic_api_key else False,
+        "base_url": settings.anthropic_base_url if hasattr(settings, 'anthropic_base_url') else None
     }
 
     try:
-        client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
+        # Create client with optional base_url
+        client_kwargs = {"api_key": settings.anthropic_api_key}
+        if hasattr(settings, 'anthropic_base_url') and settings.anthropic_base_url:
+            client_kwargs["base_url"] = settings.anthropic_base_url
+
+        client = anthropic.Anthropic(**client_kwargs)
 
         message = client.messages.create(
             model=settings.claude_model,

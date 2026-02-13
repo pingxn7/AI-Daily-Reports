@@ -17,7 +17,12 @@ class AIAnalyzer:
     """Service to analyze tweets using Claude API."""
 
     def __init__(self):
-        self.client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
+        # Create Anthropic client with optional base_url for proxy/relay
+        client_kwargs = {"api_key": settings.anthropic_api_key}
+        if settings.anthropic_base_url:
+            client_kwargs["base_url"] = settings.anthropic_base_url
+
+        self.client = anthropic.Anthropic(**client_kwargs)
         self.model = settings.claude_model
         self.max_tokens = settings.claude_max_tokens
 

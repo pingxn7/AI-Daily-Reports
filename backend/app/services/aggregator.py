@@ -20,7 +20,12 @@ class AggregatorService:
     """Service to create daily summaries of AI news."""
 
     def __init__(self):
-        self.client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
+        # Create Anthropic client with optional base_url for proxy/relay
+        client_kwargs = {"api_key": settings.anthropic_api_key}
+        if settings.anthropic_base_url:
+            client_kwargs["base_url"] = settings.anthropic_base_url
+
+        self.client = anthropic.Anthropic(**client_kwargs)
 
     def generate_url_slug(self, summary_date: date) -> str:
         """
